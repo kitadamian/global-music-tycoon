@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Global Music Tycoon - Damian Kita</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+        
+        :root {
+            --cyan: #00f5ff;
+            --magenta: #ff00ff;
+            --yellow: #ffff00;
+            --green: #00ff88;
+            --dark-bg: #0a0a0f;
+            --panel-bg: #1a1a2e;
+            --neon-glow: 0 0 10px rgba(0, 245, 255, 0.5), 0 0 20px rgba(0, 245, 255, 0.3);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            touch-action: manipulation;
+        }
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--dark-bg);
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 245, 255, 0.1) 0%, transparent 50%);
+        }
+        
+        /* Audio Control */
+        .audio-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(26, 26, 46, 0.9);
+            border: 2px solid var(--cyan);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+            transition: all 0.3s;
+            box-shadow: var(--neon-glow);
+        }
+        
+        .audio-control:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--cyan);
+        }
+        
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--panel-bg) 0%, #0f0f1e 100%);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid var(--cyan);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.2), transparent);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.5rem, 5vw, 3rem);
+            background: linear-gradient(45deg, var(--cyan), var(--magenta), var(--yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(0, 245, 255, 0.5);
+        }
+        
+        .subtitle {
+            color: var(--green);
+            font-size: clamp(0.9rem, 2vw, 1.2rem);
+            font-weight: 300;
+        }
+        
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(26, 26, 46, 0.8);
+            border-bottom: 2px solid var(--magenta);
+        }
+        
+        .stat {
+            text-align: center;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 1px solid var(--cyan);
+            min-width: 120px;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--yellow);
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            background: linear-gradient(135deg, var(--panel-bg), #0f0f1e);
+            border: 2px solid var(--cyan);
+            color: var(--cyan);
+            padding: 12px 24px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            border-radius: 5px;
+        }
+        
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .nav-btn:hover::before {
+            left: 100%;
+        }
+        
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--cyan);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px var(--cyan);
+            transform: translateY(-2px);
+        }
+        
+        /* Main Content */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .card {
+            background: linear-gradient(135deg, var(--panel-bg), #0f0f1e);
+            border: 2px solid transparent;
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 15px;
+            padding: 2px;
+            background: linear-gradient(45deg, var(--cyan), var(--magenta), var(--yellow));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(0, 245, 255, 0.3);
+        }
+        
+        .card h3 {
+            color: var(--cyan);
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .card p {
+            color: #aaa;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .card-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .card-stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, var(--magenta), #ff1493);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--magenta);
+        }
+        
+        .btn:disabled {
+            background: #444;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-success {
+            background: linear-gradient(45deg, var(--green), #00cc6a);
+        }
+        
+        .btn-success:hover {
+            box-shadow: 0 0 20px var(--green);
+        }
+        
+        /* Mini Game */
+        .mini-game {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            border: 2px solid var(--yellow);
+            margin: 20px 0;
+        }
+        
+        .rhythm-game {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .rhythm-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+        
+        .rhythm-btn:active, .rhythm-btn.hit {
+            transform: scale(0.9);
+            filter: brightness(1.5);
+        }
+        
+        .rhythm-btn:nth-child(1) { border-color: var(--cyan); color: var(--cyan); }
+        .rhythm-btn:nth-child(2) { border-color: var(--magenta); color: var(--magenta); }
+        .rhythm-btn:nth-child(3) { border-color: var(--yellow); color: var(--yellow); }
+        .rhythm-btn:nth-child(4) { border-color: var(--green); color: var(--green); }
+        
+        /* Progress Bars */
+        .progress-container {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            margin: 10px 0;
+            border: 1px solid #333;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--cyan), var(--magenta));
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--panel-bg);
+            border: 2px solid var(--cyan);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0, 245, 255, 0.3);
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--magenta);
+            transition: transform 0.3s;
+        }
+        
+        .close-modal:hover {
+            transform: rotate(90deg);
+        }
+        
+        /* Educational Content */
+        .edu-fact {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(255, 0, 255, 0.1));
+            border-left: 4px solid var(--yellow);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .edu-fact h4 {
+            color: var(--yellow);
+            margin-bottom: 5px;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        /* Author Section */
+        .author-section {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(255, 0, 255, 0.1));
+            border-radius: 20px;
+            margin-top: 30px;
+            border: 2px solid var(--cyan);
+        }
+        
+        .author-section h2 {
+            color: var(--cyan);
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 20px;
+        }
+        
+        .author-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, var(--magenta), var(--cyan));
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 0, 255, 0.4);
+        }
+        
+        .author-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 0, 255, 0.6);
+        }
+        
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: -400px;
+            background: var(--panel-bg);
+            border: 2px solid var(--green);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.3);
+            transition: right 0.5s;
+            z-index: 1500;
+            max-width: 350px;
+        }
+        
+        .notification.show {
+            right: 20px;
+        }
+        
+        .notification.error {
+            border-color: #ff0044;
+            box-shadow: 0 5px 20px rgba(255, 0, 68, 0.3);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-bar {
+                font-size: 0.9rem;
+            }
+            
+            .stat {
+                min-width: 100px;
+                padding: 8px 15px;
+            }
+            
+            .rhythm-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+            
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* Particle Effects */
+        .particle {
+            position: fixed;
+            pointer-events: none;
+            opacity: 0;
+            animation: particleFloat 1s ease-out forwards;
+            font-size: 1.5rem;
+            z-index: 3000;
+        }
+        
+        @keyframes particleFloat {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(0.5);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Audio Control -->
+    <div class="audio-control" id="audioToggle" onclick="toggleAudio()">🔇</div>
+    
+    <!-- Notifications -->
+    <div id="notification" class="notification">
+        <h4 id="notifTitle">Sukces!</h4>
+        <p id="notifText">Operacja zakończona pomyślnie.</p>
+    </div>
+
+    <header>
+        <h1>🎵 Global Music Tycoon 🎵</h1>
+        <p class="subtitle">Zarządzaj koncertami, odkrywaj historię muzyki, zdobywaj świat!</p>
+    </header>
+    
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-label">Budżet</div>
+            <div class="stat-value" id="money">$50,000</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Sława</div>
+            <div class="stat-value" id="fame">100</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Fanbase</div>
+            <div class="stat-value" id="fans">1,000</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Poziom</div>
+            <div class="stat-value" id="level">1</div>
+        </div>
+    </div>
+    
+    <nav>
+        <button class="nav-btn active" onclick="showSection('venues')">🎪 Lokalizacje</button>
+        <button class="nav-btn" onclick="showSection('concerts')">🎸 Koncerty</button>
+        <button class="nav-btn" onclick="showSection('promotion')">📢 Promocja</button>
+        <button class="nav-btn" onclick="showSection('education')">🎓 Edukacja</button>
+        <button class="nav-btn" onclick="showSection('minigame')">🎮 Mini-Gra</button>
+    </nav>
+    
+    <main>
+        <!-- Venues Section -->
+        <section id="venues" class="section active">
+            <h2 style="color: var(--cyan); font-family: 'Orbitron', sans-serif; margin-bottom: 10px;">Wybierz lokalizację koncertu</h2>
+            <p style="color: #888; margin-bottom: 20px;">Od klubów po stadiony - każda lokalizacja ma swoją pojemność i koszty.</p>
+            
+            <div class="card-grid" id="venuesGrid">
+                <!-- Venues injected by JS -->
+            </div>
+        </section>
+        
+        <!-- Concerts Section -->
+        <section id="concerts" class="section">
+            <h2 style="color: var(--magenta); font-family: 'Orbitron', sans-serif; margin-bottom: 10px;">Zarządzaj koncertami</h2>
+            <p style="color: #888; margin-bottom: 20px;">Organizuj wydarzenia i zarabiaj na biletach oraz merchandisingu.</p>
+            
+            <div class="card-grid" id="concertsGrid">
+                <!-- Active concerts injected by JS -->
+            </div>
+            
+            <div id="noConcerts" style="text-align: center; padding: 40px; color: #666;">
+                <p style="font-size: 1.2rem;">Brak aktywnych koncertów. Przejdź do zakładki Lokalizacje, aby zorganizować pierwszy koncert!</p>
+            </div>
+        </section>
+        
+        <!-- Promotion Section -->
+        <section id="promotion" class="section">
+            <h2 style="color: var(--yellow); font-family: 'Orbitron', sans-serif; margin-bottom: 10px;">Promocja i Marketing</h2>
+            <p style="color: #888; margin-bottom: 20px;">Inwestuj w promocję, aby zwiększyć sprzedaż biletów i zdobyć nowych fanów.</p>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <h3>📱 Social Media</h3>
+                    <p>Kampania w mediach społecznościowych. Niski koszt, szybkie efekty.</p>
+                    <div class="card-stats">
+                        <span class="card-stat">💰 $500</span>
+                        <span class="card-stat">👥 +50 fanów</span>
+                        <span class="card-stat">📈 +10% sprzedaży</span>
+                    </div>
+                    <button class="btn" onclick="promote('social', 500)">Uruchom kampanię</button>
+                </div>
+                
+                <div class="card">
+                    <h3>📻 Radio & TV</h3>
+                    <p>Reklamy w radiu i telewizji. Średni zasięg, profesjonalny wizerunek.</p>
+                    <div class="card-stats">
+                        <span class="card-stat">💰 $2,000</span>
+                        <span class="card-stat">👥 +200 fanów</span>
+                        <span class="card-stat">📈 +25% sprzedaży</span>
+                    </div>
+                    <button class="btn" onclick="promote('radio', 2000)">Kup reklamę</button>
+                </div>
+                
+                <div class="card">
+                    <h3>🌐 Globalna Trasa</h3>
+                    <p>Międzynarodowa promocja z billboardami i influencerami.</p>
+                    <div class="card-stats">
+                        <span class="card-stat">💰 $10,000</span>
+                        <span class="card-stat">👥 +1,000 fanów</span>
+                        <span class="card-stat">📈 +50% sprzedaży</span>
+                    </div>
+                    <button class="btn" onclick="promote('global', 10000)">Globalny reach</button>
+                </div>
+                
+                <div class="card">
+                    <h3>🤝 Sponsorzy</h3>
+                    <p>Zdobądź sponsorów dla swoich wydarzeń. Dodatkowy przychód!</p>
+                    <div class="card-stats">
+                        <span class="card-stat">💰 +$5,000</span>
+                        <span class="card-stat">⭐ +50 sławy</span>
+                        <span class="card-stat">🎯 Wymagany poziom 3</span>
+                    </div>
+                    <button class="btn btn-success" onclick="getSponsors()" id="sponsorBtn">Znajdź sponsorów</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Education Section -->
+        <section id="education" class="section">
+            <h2 style="color: var(--green); font-family: 'Orbitron', sans-serif; margin-bottom: 10px;">Akademia Muzyczna</h2>
+            <p style="color: #888; margin-bottom: 20px;">Ucz się historii muzyki, odkrywaj ciekawostki o festiwalach i podnosz swoje umiejętności.</p>
+            
+            <div class="edu-fact">
+                <h4>🎵 Historia Woodstock (1969)</h4>
+                <p>Festiwal w Bethel, Nowy Jork, zgromadził ponad 400,000 ludzi. Pomimo deszczu i braku jedzenia, stał się symbolem pokoju i muzyki. Wystąpili tam Jimi Hendrix, Janis Joplin i The Who.</p>
+            </div>
+            
+            <div class="edu-fact">
+                <h4>🎸 Legenda Live Aid (1985)</h4>
+                <p>Pierwszy wielki koncert charytatywny transmitowany na żywo z Londynu i Filadelfii. Queen wykonał historyczny 20-minutowy set, który uważany jest za jeden z najlepszych występów w historii rocka.</p>
+            </div>
+            
+            <div class="edu-fact">
+                <h4>🌍 Coachella Valley</h4>
+                <p>Jeden z najbardziej dochodowych festiwali na świecie, generujący ponad $100 milionów rocznie. Słynie z instalacji artystycznych i niespodziewanych gości specjalnych.</p>
+            </div>
+            
+            <div class="edu-fact">
+                <h4>🎤 Technika Koncertowa</h4>
+                <p>System line array (szeregowy) to metoda ustawienia głośników, która zapewnia równomierne pokrycie dźwiękiem dużych przestrzeni. Została wprowadzona na masową skalę w latach 90.</p>
+            </div>
+            
+            <div class="card-grid" style="margin-top: 30px;">
+                <div class="card">
+                    <h3>🎓 Kurs Zarządzania Sceną</h3>
+                    <p>Naucz się technicznych aspektów organizacji koncertów. Zmniejsz koszty o 20%!</p>
+                    <button class="btn" onclick="learnSkill('stage')">Ucz się ($1,000)</button>
+                </div>
+                <div class="card">
+                    <h3>🎨 Marketing Muzyczny</h3>
+                    <p>Poznaj strategie promocji artystów. Zwiększ zyski z merchandisingu!</p>
+                    <button class="btn" onclick="learnSkill('marketing')">Ucz się ($1,500)</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Mini Game Section -->
+        <section id="minigame" class="section">
+            <h2 style="color: var(--cyan); font-family: 'Orbitron', sans-serif; margin-bottom: 10px;">Rytmiczna Gra Refleksu</h2>
+            <p style="color: #888; margin-bottom: 20px;">Klikaj w przyciski w rytmie muzyki, aby zdobyć bonusy do następnego koncertu!</p>
+            
+            <div class="mini-game">
+                <div style="font-size: 3rem; margin-bottom: 20px;">🎵 🎶 🎵</div>
+                <h3 style="color: var(--yellow); margin-bottom: 20px;">Wynik: <span id="gameScore">0</span></h3>
+                <p style="margin-bottom: 20px;">Klikaj kolorowe przyciski gdy się podświetlą!</p>
+                
+                <div class="rhythm-game">
+                    <div class="rhythm-btn" id="btn0" onclick="hitNote(0)">♪</div>
+                    <div class="rhythm-btn" id="btn1" onclick="hitNote(1)">♫</div>
+                    <div class="rhythm-btn" id="btn2" onclick="hitNote(2)">♬</div>
+                    <div class="rhythm-btn" id="btn3" onclick="hitNote(3)">♭</div>
+                </div>
+                
+                <button class="btn btn-success" onclick="startRhythmGame()" id="startGameBtn">Rozpocznij grę</button>
+                <p style="margin-top: 20px; color: var(--green);">Nagroda: Do $5,000 i +100 fanów!</p>
+            </div>
+        </section>
+        
+        <!-- Author Section -->
+        <div class="author-section">
+            <h2>👨‍💻 O Autorze</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 15px;">Gra stworzona przez <strong style="color: var(--cyan);">Damian Kita</strong></p>
+            <p style="color: #aaa; margin-bottom: 20px;">Pasjonat muzyki, programowania i designu. Twórca interaktywnych doświadczeń cyfrowych.</p>
+            <a href="https://linktr.ee/kitadamian" target="_blank" class="author-link">🌐 Zobacz więcej projektów</a>
+        </div>
+    </main>
+    
+    <!-- Modal for Concert Details -->
+    <div id="concertModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle" style="color: var(--cyan); font-family: 'Orbitron'; margin-bottom: 20px;"></h2>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        let gameState = {
+            money: 50000,
+            fame: 100,
+            fans: 1000,
+            level: 1,
+            concerts: [],
+            skills: { stage: false, marketing: false },
+            audioEnabled: false
+        };
+        
+        // Venues Data with Educational Facts
+        const venues = [
+            {
+                id: 1,
+                name: "Klub Blue Note, Warszawa",
+                location: "Polska",
+                capacity: 500,
+                cost: 5000,
+                ticketPrice: 50,
+                popularity: 1.2,
+                fact: "Blue Note to historyczny klub jazzowy, nazwany na cześć słynnej wytwórni Blue Note Records założonej w 1939 roku.",
+                image: "🎷"
+            },
+            {
+                id: 2,
+                name: "O2 Arena, Londyn",
+                location: "Wielka Brytania",
+                capacity: 20000,
+                cost: 50000,
+                ticketPrice: 80,
+                popularity: 1.5,
+                fact: "O2 Arena była główną areną igrzysk olimpijskich w 2012 roku. Pomieściła koncerty takich gwiazd jak Adele czy Prince.",
+                image: "🇬🇧"
+            },
+            {
+                id: 3,
+                name: "Red Rocks, Kolorado",
+                location: "USA",
+                capacity: 9500,
+                cost: 35000,
+                ticketPrice: 75,
+                popularity: 1.8,
+                fact: "Amfiteatr wykuty w czerwonych skałach piaskowca. The Beatles wystąpili tu w 1964 roku - jedyny koncert, który nie wyprzedał się podczas ich trasy po USA.",
+                image: "🌄"
+            },
+            {
+                id: 4,
+                name: "Sziget Festival, Budapeszt",
+                location: "Węgry",
+                capacity: 50000,
+                cost: 150000,
+                ticketPrice: 60,
+                popularity: 2.0,
+                fact: "Jeden z największych festiwali w Europie, odbywający się na wyspie Óbuda. Rocznie przyciąga ponad 500,000 uczestników.",
+                image: "🏝️"
+            },
+            {
+                id: 5,
+                name: "Tokyo Dome, Tokio",
+                location: "Japonia",
+                capacity: 55000,
+                cost: 300000,
+                ticketPrice: 100,
+                popularity: 2.5,
+                fact: "Pierwszy koncert w Tokyo Dome wygłosiła The Rolling Stones w 1990 roku. Jest to najważniejsza arena koncertowa w Azji.",
+                image: "🇯🇵"
+            },
+            {
+                id: 6,
+                name: "Tomorrowland, Belgia",
+                location: "Belgia",
+                capacity: 400000,
+                cost: 1000000,
+                ticketPrice: 120,
+                popularity: 3.0,
+                fact: "Największy festiwal muzyki elektronicznej na świecie. Bilety wyprzedają się w ciągu kilku minut, a sceny są dziełami sztuki architektonicznej.",
+                image: "🎡"
+            }
+        ];
+        
+        // Audio Context for Sound Effects
+        let audioContext = null;
+        
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+        
+        function playSound(type) {
+            if (!gameState.audioEnabled || !audioContext) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            switch(type) {
+                case 'click':
+                    oscillator.frequency.value = 800;
+                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.1);
+                    break;
+                case 'success':
+                    oscillator.frequency.value = 523.25; // C5
+                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                    break;
+                case 'error':
+                    oscillator.frequency.value = 200;
+                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                    break;
+                case 'beat':
+                    oscillator.frequency.value = 440;
+                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.1);
+                    break;
+            }
+        }
+        
+        function toggleAudio() {
+            gameState.audioEnabled = !gameState.audioEnabled;
+            document.getElementById('audioToggle').textContent = gameState.audioEnabled ? '🔊' : '🔇';
+            if (gameState.audioEnabled) {
+                initAudio();
+                showNotification('Audio włączone', 'Efekty dźwiękowe aktywne!');
+            } else {
+                showNotification('Audio wyłączone', 'Efekty dźwiękowe nieaktywne.');
+            }
+        }
+        
+        // UI Functions
+        function updateStats() {
+            document.getElementById('money').textContent = '$' + gameState.money.toLocaleString();
+            document.getElementById('fame').textContent = gameState.fame.toLocaleString();
+            document.getElementById('fans').textContent = gameState.fans.toLocaleString();
+            document.getElementById('level').textContent = gameState.level;
+            
+            // Check level up
+            if (gameState.fame >= gameState.level * 500) {
+                gameState.level++;
+                showNotification('Level Up!', `Osiągnąłeś poziom ${gameState.level}!`);
+                playSound('success');
+                createParticles(window.innerWidth/2, window.innerHeight/2, '🆙');
+            }
+        }
+        
+        function showSection(sectionId) {
+            playSound('click');
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (sectionId === 'venues') renderVenues();
+            if (sectionId === 'concerts') renderConcerts();
+        }
+        
+        function showNotification(title, text, isError = false) {
+            const notif = document.getElementById('notification');
+            document.getElementById('notifTitle').textContent = title;
+            document.getElementById('notifText').textContent = text;
+            notif.className = 'notification show' + (isError ? ' error' : '');
+            
+            setTimeout(() => {
+                notif.classList.remove('show');
+            }, 3000);
+        }
+        
+        function createParticles(x, y, char) {
+            for (let i = 0; i < 5; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.textContent = char;
+                particle.style.left = (x + Math.random() * 100 - 50) + 'px';
+                particle.style.top = (y + Math.random() * 100 - 50) + 'px';
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 1000);
+            }
+        }
+        
+        // Venues Logic
+        function renderVenues() {
+            const grid = document.getElementById('venuesGrid');
+            grid.innerHTML = venues.map(venue => `
+                <div class="card" onclick="showVenueDetails(${venue.id})">
+                    <h3>${venue.image} ${venue.name}</h3>
+                    <p>${venue.fact.substring(0, 100)}...</p>
+                    <div class="card-stats">
+                        <span class="card-stat">👥 ${venue.capacity.toLocaleString()}</span>
+                        <span class="card-stat">💰 $${venue.cost.toLocaleString()}</span>
+                        <span class="card-stat">📍 ${venue.location}</span>
+                    </div>
+                    <button class="btn" onclick="event.stopPropagation(); organizeConcert(${venue.id})" 
+                        ${gameState.money < venue.cost ? 'disabled' : ''}>
+                        ${gameState.money < venue.cost ? 'Za mało środków' : 'Zorganizuj koncert'}
+                    </button>
+                </div>
+            `).join('');
+        }
+        
+        function showVenueDetails(venueId) {
+            const venue = venues.find(v => v.id === venueId);
+            document.getElementById('modalTitle').innerHTML = `${venue.image} ${venue.name}`;
+            document.getElementById('modalContent').innerHTML = `
+                <div style="color: #aaa; line-height: 1.8;">
+                    <p><strong style="color: var(--cyan);">Lokalizacja:</strong> ${venue.location}</p>
+                    <p><strong style="color: var(--magenta);">Pojemność:</strong> ${venue.capacity.toLocaleString()} osób</p>
+                    <p><strong style="color: var(--yellow);">Koszt organizacji:</strong> $${venue.cost.toLocaleString()}</p>
+                    <p><strong style="color: var(--green);">Cena biletu:</strong> $${venue.ticketPrice}</p>
+                    <div class="edu-fact" style="margin-top: 20px;">
+                        <h4>🎓 Ciekawostka historyczna:</h4>
+                        <p>${venue.fact}</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('concertModal').classList.add('active');
+            playSound('click');
+        }
+        
+        function organizeConcert(venueId) {
+            const venue = venues.find(v => v.id === venueId);
+            if (gameState.money < venue.cost) {
+                showNotification('Błąd', 'Za mało środków!', true);
+                playSound('error');
+                return;
+            }
+            
+            gameState.money -= venue.cost;
+            
+            const concert = {
+                id: Date.now(),
+                venue: venue,
+                ticketsSold: 0,
+                maxTickets: venue.capacity,
+                day: 0,
+                maxDays: 7,
+                promotion: 1,
+                revenue: 0
+            };
+            
+            gameState.concerts.push(concert);
+            updateStats();
+            showNotification('Koncert zaplanowany!', `Zorganizowałeś koncert w ${venue.name}`);
+            playSound('success');
+            createParticles(event.clientX, event.clientY, '🎸');
+            
+            // Start concert simulation
+            simulateConcert(concert);
+        }
+        
+        function simulateConcert(concert) {
+            const interval = setInterval(() => {
+                concert.day++;
+                
+                // Calculate ticket sales based on fans, fame and promotion
+                const dailySales = Math.floor(
+                    (gameState.fans * 0.1 * concert.venue.popularity * concert.promotion) / concert.maxDays
+                );
+                
+                const actualSales = Math.min(dailySales, concert.maxTickets - concert.ticketsSold);
+                concert.ticketsSold += actualSales;
+                concert.revenue += actualSales * concert.venue.ticketPrice;
+                
+                // Update concert in array
+                const idx = gameState.concerts.findIndex(c => c.id === concert.id);
+                if (idx !== -1) gameState.concerts[idx] = concert;
+                
+                if (concert.day >= concert.maxDays || concert.ticketsSold >= concert.maxTickets) {
+                    clearInterval(interval);
+                    finishConcert(concert);
+                }
+                
+                if (document.getElementById('concerts').classList.contains('active')) {
+                    renderConcerts();
+                }
+            }, 2000); // 2 seconds = 1 day in game
+        }
+        
+        function renderConcerts() {
+            const grid = document.getElementById('concertsGrid');
+            const noConcerts = document.getElementById('noConcerts');
+            
+            if (gameState.concerts.length === 0) {
+                grid.innerHTML = '';
+                noConcerts.style.display = 'block';
+                return;
+            }
+            
+            noConcerts.style.display = 'none';
+            grid.innerHTML = gameState.concerts.map(concert => {
+                const progress = (concert.ticketsSold / concert.maxTickets) * 100;
+                return `
+                    <div class="card">
+                        <h3>${concert.venue.image} ${concert.venue.name}</h3>
+                        <p>Dzień ${concert.day}/${concert.maxDays}</p>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: ${progress}%">
+                                ${Math.floor(progress)}%
+                            </div>
+                        </div>
+                        <div class="card-stats">
+                            <span class="card-stat">🎫 ${concert.ticketsSold.toLocaleString()}/${concert.maxTickets.toLocaleString()}</span>
+                            <span class="card-stat">💵 $${concert.revenue.toLocaleString()}</span>
+                        </div>
+                        <p style="font-size: 0.9rem; color: ${concert.promotion > 1 ? 'var(--green)' : '#888'};">
+                            Mnożnik promocji: x${concert.promotion.toFixed(1)}
+                        </p>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function finishConcert(concert) {
+            // Calculate final revenue
+            const merchRevenue = concert.ticketsSold * (gameState.skills.marketing ? 15 : 10);
+            const totalRevenue = concert.revenue + merchRevenue;
+            
+            gameState.money += totalRevenue;
+            gameState.fame += Math.floor(concert.ticketsSold / 100);
+            gameState.fans += Math.floor(concert.ticketsSold / 10);
+            
+            // Remove from active concerts
+            gameState.concerts = gameState.concerts.filter(c => c.id !== concert.id);
+            
+            showNotification(
+                'Koncert zakończony!', 
+                `Zarobiłeś $${totalRevenue.toLocaleString()} (w tym $${merchRevenue.toLocaleString()} z merchu)!`
+            );
+            playSound('success');
+            updateStats();
+            
+            if (document.getElementById('concerts').classList.contains('active')) {
+                renderConcerts();
+            }
+        }
+        
+        // Promotion Logic
+        function promote(type, cost) {
+            if (gameState.money < cost) {
+                showNotification('Błąd', 'Za mało środków na promocję!', true);
+                playSound('error');
+                return;
+            }
+            
+            gameState.money -= cost;
+            
+            let fansGain = 0;
+            let multiplier = 1;
+            
+            switch(type) {
+                case 'social':
+                    fansGain = 50;
+                    multiplier = 1.1;
+                    break;
+                case 'radio':
+                    fansGain = 200;
+                    multiplier = 1.25;
+                    break;
+                case 'global':
+                    fansGain = 1000;
+                    multiplier = 1.5;
+                    break;
+            }
+            
+            gameState.fans += fansGain;
+            
+            // Apply multiplier to all active concerts
+            gameState.concerts.forEach(concert => {
+                concert.promotion = Math.max(concert.promotion, multiplier);
+            });
+            
+            updateStats();
+            showNotification('Promocja aktywna!', `Zdobyto ${fansGain.toLocaleString()} nowych fanów!`);
+            playSound('success');
+            createParticles(event.clientX, event.clientY, '📢');
+        }
+        
+        function getSponsors() {
+            if (gameState.level < 3) {
+                showNotification('Wymagany poziom 3', 'Zdobądź więcej sławy, aby przyciągnąć sponsorów!', true);
+                playSound('error');
+                return;
+            }
+            
+            gameState.money += 5000;
+            gameState.fame += 50;
+            updateStats();
+            showNotification('Sponsorzy znalezieni!', 'Otrzymałeś $5,000 i +50 sławy!');
+            playSound('success');
+            
+            document.getElementById('sponsorBtn').disabled = true;
+            setTimeout(() => {
+                document.getElementById('sponsorBtn').disabled = false;
+            }, 10000);
+        }
+        
+        // Education Logic
+        function learnSkill(skill) {
+            const cost = skill === 'stage' ? 1000 : 1500;
+            if (gameState.money < cost) {
+                showNotification('Błąd', 'Za mało środków!', true);
+                return;
+            }
+            
+            if (gameState.skills[skill]) {
+                showNotification('Info', 'Masz już tę umiejętność!', true);
+                return;
+            }
+            
+            gameState.money -= cost;
+            gameState.skills[skill] = true;
+            gameState.fame += 25;
+            updateStats();
+            showNotification('Umiejętność zdobyta!', `Odblokowano: ${skill === 'stage' ? 'Zarządzanie Sceną' : 'Marketing Muzyczny'}`);
+            playSound('success');
+        }
+        
+        // Rhythm Mini Game
+        let gameActive = false;
+        let score = 0;
+        let gameInterval;
+        let currentSequence = [];
+        let playerIndex = 0;
+        
+        function startRhythmGame() {
+            if (gameActive) return;
+            
+            gameActive = true;
+            score = 0;
+            document.getElementById('gameScore').textContent = score;
+            document.getElementById('startGameBtn').disabled = true;
+            document.getElementById('startGameBtn').textContent = 'Gra w toku...';
+            
+            playSequence();
+        }
+        
+        function playSequence() {
+            currentSequence = [];
+            playerIndex = 0;
+            
+            // Generate random sequence based on score
+            const length = Math.min(4 + Math.floor(score / 100), 8);
+            
+            for (let i = 0; i < length; i++) {
+                currentSequence.push(Math.floor(Math.random() * 4));
+            }
+            
+            // Play sequence visually
+            let i = 0;
+            const playInterval = setInterval(() => {
+                if (i >= currentSequence.length) {
+                    clearInterval(playInterval);
+                    return;
+                }
+                
+                const btn = document.getElementById(`btn${currentSequence[i]}`);
+                btn.classList.add('hit');
+                playSound('beat');
+                setTimeout(() => btn.classList.remove('hit'), 200);
+                i++;
+            }, 600);
+        }
+        
+        function hitNote(btnIndex) {
+            if (!gameActive) return;
+            
+            if (btnIndex === currentSequence[playerIndex]) {
+                playerIndex++;
+                score += 10;
+                document.getElementById('gameScore').textContent = score;
+                playSound('click');
+                
+                if (playerIndex >= currentSequence.length) {
+                    // Round complete
+                    setTimeout(() => {
+                        if (score >= 200) {
+                            endGame(true);
+                        } else {
+                            playSequence();
+                        }
+                    }, 500);
+                }
+            } else {
+                // Wrong note
+                endGame(false);
+            }
+        }
+        
+        function endGame(won) {
+            gameActive = false;
+            document.getElementById('startGameBtn').disabled = false;
+            document.getElementById('startGameBtn').textContent = 'Rozpocznij grę';
+            
+            if (won) {
+                const reward = Math.min(5000, score * 20);
+                const fans = Math.min(100, Math.floor(score / 10));
+                gameState.money += reward;
+                gameState.fans += fans;
+                updateStats();
+                showNotification('Wygrana!', `Zdobyłeś $${reward} i ${fans} fanów!`);
+                playSound('success');
+            } else {
+                showNotification('Porażka!', 'Spróbuj ponownie!', true);
+                playSound('error');
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('concertModal').classList.remove('active');
+        }
+        
+        // Close modal on outside click
+        document.getElementById('concertModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+        
+        // Initialize
+        renderVenues();
+        updateStats();
+        
+        // Passive income every 30 seconds
+        setInterval(() => {
+            if (gameState.fans > 0) {
+                const passiveIncome = Math.floor(gameState.fans * 0.1);
+                gameState.money += passiveIncome;
+                updateStats();
+                showNotification('Przychód pasywny', `Zarobiłeś $${passiveIncome} z merchu!`);
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
